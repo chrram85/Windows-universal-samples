@@ -5,25 +5,25 @@ jobs:
     runs-on: windows-2022
     steps:
       - uses: actions/checkout@v4
-      - name: Diagnose
-        shell: pwsh
-        run: |
-          Get-ChildItem "C:\Program Files\Microsoft Visual Studio" | Select-Object Name
-          Get-ChildItem "C:\Program Files\Microsoft Visual Studio\*\*\MSBuild\Microsoft\VC" | Select-Object FullName
-          Get-ChildItem "C:\Program Files\Microsoft Visual Studio\*\*\MSBuild\Microsoft\VC\*\Platforms\x64\PlatformToolsets" -ErrorAction SilentlyContinue | Select-Object FullName
-          Get-ChildItem "${env:ProgramFiles(x86)}\Windows Kits\10\Include" | Select-Object Name
+
       - uses: microsoft/setup-msbuild@v2
         with:
           vs-version: '[17.0,18.0)'
+
       - name: Build
         shell: pwsh
         run: |
-          $sdk = (Get-ChildItem "${env:ProgramFiles(x86)}\Windows Kits\10\Include" | Sort-Object Name -Descending | Select-Object -First 1).Name
+          $sdk = (Get-ChildItem "${env:ProgramFiles(x86)}\Windows Kits\10\Include" |
+            Where-Object { $_.Name -match '^10\.0\.\d+\.\d+$' } |
+            Sort-Object { [version]$_.Name } -Descending |
+            Select-Object -First 1).Name
+          Write-Host "Using SDK: $sdk"
           msbuild Samples\Simple3DGameDX\cpp\Simple3DGameDX.sln /restore `
             /p:Configuration=Release /p:Platform=x64 `
-            /p:PlatformToolset=v145 /p:WindowsTargetPlatformVersion=$sdk `
+            /p:PlatformToolset=v143 /p:WindowsTargetPlatformVersion=$sdk `
             /p:AppxBundle=Never /p:UapAppxPackageBuildMode=SideloadOnly `
             /p:AppxPackageSigningEnabled=false
+
       - uses: actions/upload-artifact@v4
         if: always()
         with:
