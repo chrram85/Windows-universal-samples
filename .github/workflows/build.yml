@@ -21,7 +21,7 @@ jobs:
           $sdk = (Get-ChildItem "${env:ProgramFiles(x86)}\Windows Kits\10\Include" | Sort-Object Name -Descending | Select-Object -First 1).Name
           msbuild Samples\Simple3DGameDX\cpp\Simple3DGameDX.sln /restore `
             /p:Configuration=Release /p:Platform=x64 `
-            /p:PlatformToolset=v143 /p:WindowsTargetPlatformVersion=$sdk `
+            /p:PlatformToolset=v145 /p:WindowsTargetPlatformVersion=$sdk `
             /p:AppxBundle=Never /p:UapAppxPackageBuildMode=SideloadOnly `
             /p:AppxPackageSigningEnabled=false
       - uses: actions/upload-artifact@v4
