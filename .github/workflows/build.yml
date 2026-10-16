@@ -5,7 +5,16 @@ jobs:
     runs-on: windows-2022
     steps:
       - uses: actions/checkout@v4
+      - name: Diagnose
+        shell: pwsh
+        run: |
+          Get-ChildItem "C:\Program Files\Microsoft Visual Studio" | Select-Object Name
+          Get-ChildItem "C:\Program Files\Microsoft Visual Studio\*\*\MSBuild\Microsoft\VC" | Select-Object FullName
+          Get-ChildItem "C:\Program Files\Microsoft Visual Studio\*\*\MSBuild\Microsoft\VC\*\Platforms\x64\PlatformToolsets" -ErrorAction SilentlyContinue | Select-Object FullName
+          Get-ChildItem "${env:ProgramFiles(x86)}\Windows Kits\10\Include" | Select-Object Name
       - uses: microsoft/setup-msbuild@v2
+        with:
+          vs-version: '[17.0,18.0)'
       - name: Build
         shell: pwsh
         run: |
